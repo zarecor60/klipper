@@ -217,7 +217,7 @@ class ControlPID:
                 ramp_target = target_temp
 
         # Calculate accumulated temperature "error"
-        temp_err = target_temp - temp
+        temp_err = ramp_target - temp
         if target_temp == 0:
             temp_integ = 0
             self.prev_temp_integ = 0

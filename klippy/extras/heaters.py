@@ -203,14 +203,14 @@ class ControlPID:
             temp_deriv = (self.prev_temp_deriv * (self.min_deriv_time-time_diff)
                           + temp_diff) / self.min_deriv_time
 
-        temp_rampinc = self.ramp / time_diff
+        temp_rampinc = self.ramp * time_diff
 
         if self.ramp == 0:
             ramp_target = target_temp
         else:
-            if self.prev_target_temp < target_temp:
+            if ramp_target < target_temp:
                 if ramp_target < target_temp:
-                    ramp_target = self.prev_temp_target + temp_rampinc
+                    ramp_target = ramp_target + temp_rampinc
                 if (ramp_target >= target_temp):
                     ramp_target = target_temp
             else:

@@ -179,6 +179,7 @@ class ControlPID:
         self.Kp = config.getfloat('pid_Kp') / PID_PARAM_BASE
         self.Ki = config.getfloat('pid_Ki') / PID_PARAM_BASE
         self.Kd = config.getfloat('pid_Kd') / PID_PARAM_BASE
+        self.ramp = config.getfloat('pid_ramp')
         self.min_deriv_time = heater.get_smooth_time()
         self.temp_integ_max = 0.
         if self.Ki:
@@ -187,15 +188,34 @@ class ControlPID:
         self.prev_temp_time = 0.
         self.prev_temp_deriv = 0.
         self.prev_temp_integ = 0.
+        self.prev_target_temp = 0.
     def temperature_update(self, read_time, temp, target_temp):
         time_diff = read_time - self.prev_temp_time
         # Calculate change of temperature
         temp_diff = temp - self.prev_temp
+        if self.prev_target_temp != target_temp:
+            self.prev_target_temp = target_temp
+            ramp_target = temp
+
         if time_diff >= self.min_deriv_time:
             temp_deriv = temp_diff / time_diff
         else:
             temp_deriv = (self.prev_temp_deriv * (self.min_deriv_time-time_diff)
                           + temp_diff) / self.min_deriv_time
+
+        temp_rampinc = self.ramp / time_diff
+
+        if self.ramp == 0:
+            ramp_target = target_temp
+        else:
+            if self.prev_target_temp < target_temp:
+                if ramp_target < target_temp:
+                    ramp_target = self.prev_temp_target + temp_rampinc
+                if (ramp_target >= target_temp):
+                    ramp_target = target_temp
+            else:
+                ramp_target = target_temp
+
         # Calculate accumulated temperature "error"
         temp_err = target_temp - temp
         if target_temp == 0:

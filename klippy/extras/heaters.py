@@ -209,10 +209,7 @@ class ControlPID:
             ramp_target = target_temp
         else:
             if ramp_target < target_temp:
-                if ramp_target < target_temp:
-                    ramp_target = ramp_target + temp_rampinc
-                if (ramp_target >= target_temp):
-                    ramp_target = target_temp
+                ramp_target = ramp_target + temp_rampinc
             else:
                 ramp_target = target_temp
 
